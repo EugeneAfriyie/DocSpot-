@@ -28,3 +28,10 @@
 .grid-cols-auto {
   grid-template-columns: var(--grid-cols-auto);
 }
+
+
+@media (max-width: 768px) {
+  .active p {
+    @apply text-white bg-primary
+  }
+}
