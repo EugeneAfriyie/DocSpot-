@@ -3,6 +3,7 @@ import cors from "cors";
 import 'dotenv/config';
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/Cloudinary.js";
+import { adminRouter } from "./routes/adminRoute.js";
 
 
 // pp config
@@ -18,9 +19,8 @@ app.use(express.json());
 app.use(cors());
 
 //  api endpoints
-app.get("/", (req, res) => {
-    res.send("Hello Api is working fine!");
-});
+app.use("/api/admin",adminRouter)
+// localhost:5000/api/admin/
 
 // start the server
 app.listen(PORT, () => {
