@@ -3,6 +3,8 @@ import bycrypt, { hash } from 'bcrypt';
 import {v2 as cloudinary} from 'cloudinary';
 import doctorModel from '../model/doctorModel.js';
 import jwt from 'jsonwebtoken';
+import 'dotenv/config';
+
 
 
 // APIFOR ADDING DOCTORS
