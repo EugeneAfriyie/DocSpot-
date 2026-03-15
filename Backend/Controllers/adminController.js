@@ -89,24 +89,46 @@ const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign( email+password , process.env.JWT_SECRET); 
 
-            return res.status(200).json({ success: true, message: 'Admin logged in successfully', token });
-        }else {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
-        }
+        console.log("Email:", email);
+console.log("Password:", password);
+console.log("Expected:", process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD);
 
-        // if (!email || !password) {
-        //     return res.status(400).json({ success: false, message: 'Email and password are required' });
-        // }
-    } catch (error) {
-        console.error('Error logging in admin:', error);
-        res.status(500).json({ success: false, message: error.message || 'Server error' });
-    }
-
-
+if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.status(200).json({ success: true, message: 'Admin logged in successfully', token });
+} else {
+    console.log("Invalid credentials reached!");
+    return res.json({ success: false, message: 'Invalid email or password' });
 }
 
+        // 1. Check if env variables are loaded (Debugging)
+        if (!process.env.ADMIN_EMAIL || !process.env.JWT_SECRET) {
+            return res.status(500).json({ success: false, message: "Server configuration missing" });
+        }
+
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            
+            // 2. FIX: Pass an object to jwt.sign
+            // Also, don't include the password in the token payload for security!
+            const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1d' }); 
+
+            return res.status(200).json({ 
+                success: true, 
+                message: 'Admin logged in successfully', 
+                token 
+            });
+        } else {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Invalid email or password' 
+            });
+        }
+    } catch (error) {
+        console.error('Error logging in admin:', error);
+        // This ensures the frontend ALWAYS gets JSON even on crash
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 export  {addDoctor,adminLogin}; 

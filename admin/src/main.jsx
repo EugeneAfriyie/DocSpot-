@@ -6,6 +6,10 @@ import AdmincontextProvider from './context/AdminContext.jsx'
 import AppcontextProvider from './context/AppContext.jsx'
 import DoctorcontextProvider from './context/DoctorContext.jsx'
 
+// App.jsx
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
   <AdmincontextProvider>
