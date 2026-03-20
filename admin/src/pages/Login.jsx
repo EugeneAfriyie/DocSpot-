@@ -60,7 +60,7 @@ const Login = () => {
                         required 
                     />
                 </div>
-                <div className="w-full">
+                <div className="w-full ">
                     <p>Password</p>
                     <input 
                         onChange={(e) => setPassword(e.target.value)} 
