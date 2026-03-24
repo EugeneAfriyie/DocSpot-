@@ -2,6 +2,7 @@ import React from 'react'
 import { AppContext } from '../context/AppContext'
 import { useContext } from 'react'
 import { useEffect } from 'react'
+import { assets } from '../assets/assets_frontend/assets'
 
 const My_Profile = () => {
 
@@ -9,6 +10,40 @@ const My_Profile = () => {
   
   
   const [isEdit, setIsEdit] = React.useState(true) 
+  const [image, setImage] = React.useState(null)
+
+  const updateProfile = async () => {
+    const formData = new FormData()
+    formData.append('name', userData.name)
+    formData.append('email', userData.email)
+    formData.append('phone', userData.phone)
+    formData.append('address', JSON.stringify(userData.address))
+    formData.append('gender', userData.gender)
+    formData.append('DOB', userData.DOB)
+    formData.append('image', image)
+    try {
+      const response = await fetch('/api/user/update', {
+        method: 'PUT',
+        body: formData,
+      })
+      const data = await response.json()
+      if (data.success) {
+        setUserdata(data.user)
+        setIsEdit(false)
+      } else {
+        console.log(data.message)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0])
+  }
+
+ 
+
   
   
   // if (!userData) return <p>Loading profile...</p>;
@@ -18,7 +53,22 @@ const My_Profile = () => {
   return (
     userData && (
       <div className='max-w-lg flex flex-col gap-2 text-sm'>
+
+      {
+        isEdit ?
+        <label htmlFor="image" className="cursor-pointer">
+          <div className="inline-block relative">
+            <img className='w-36 rounded opacity-75 ' src={image ? URL.createObjectURL(image) : userData.image} alt="" />
+            <img className='w-10 absolute bottom-12 right-12 ' src={image ? "" : assets.upload_icon  } alt="" />
+          </div>
+          <input onChange={(e) => { setImage(e.target.files[0])}} type="file" id='image' hidden/>
+        </label>
+        :
       <img className=' w-36 rounded' src={userData.image} alt="" />
+      }
+
+
+
 
       {isEdit ? <input type="text" onChange={e => setUserdata(prev => ({...prev,name: e.target.value}))} value={userData.name} className=' bg-gray-50 text-3xl font-medium max-w-60 mt-4'  /> : <p className='font-medium text-3xl text-neutral-800 mt-4 '>{userData.name}</p>}
       <hr className='bg-zinc-400 border-none' />
