@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import {   toast } from 'react-toastify';
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
 export const AppContext = createContext()
@@ -16,15 +17,17 @@ const AppContextProvider = (props) => {
     const [userdata,setUserdata] = useState(false)
 
 
+
+
     const getDocList = async () => {
         try {
-            console.log('Fetching doctors from:', backendUrl + `/api/doctor/list`);
+            // console.log('Fetching doctors from:', backendUrl + `/api/doctor/list`);
             const { data } = await axios.get( backendUrl + `/api/doctor/list` );
             // toast.success(data.message);
 
             if (data.success) {
                 setDoctors(data.doctors);
-                console.log("Doctors loaded:", data)
+                // console.log("Doctors loaded:", data)
                 toast.success(data.message);
             } else {
                 toast.error(data.message);
@@ -76,24 +79,24 @@ const AppContextProvider = (props) => {
         }
     }
 
-const loadUserData = async () => {
-  try {
-    const { data } = await axios.get(
-      `${backendUrl}/api/user/get-profile-details`,
-      { headers: { token } }
-    );
+    const loadUserData = async () => {
+    try {
+        const { data } = await axios.get(
+        `${backendUrl}/api/user/get-profile-details`,
+        { headers: { token } }
+        );
 
-    if (data.success) {
-      setUserdata(data.user);
-      console.log("Loaded user:", data.user); // log here
-    } else {
-      toast.error(data.message);
+        if (data.success) {
+        setUserdata(data.user);
+        //   console.log("Loaded user:", data.user); // log here
+        } else {
+        toast.error(data.message);
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || error.message);
     }
-  } catch (error) {
-    console.error(error);
-    toast.error(error.response?.data?.message || error.message);
-  }
-};
+    };
 
     useEffect(() =>{
         getDocList()
@@ -113,8 +116,10 @@ const loadUserData = async () => {
 
 
 
+
+
     const value = {
-        doctors,currencySymbol,token,setToken,backendUrl,setUserdata,userdata,loadUserData
+        doctors,currencySymbol,token,setToken,backendUrl,setUserdata,userdata,loadUserData,getDocList
     }
 
     return (
