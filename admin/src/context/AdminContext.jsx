@@ -8,7 +8,19 @@ const AdmincontextProvider = (props) => {
 
     const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken') || null);
     const [doctors, setDoctors] = useState([]);
+    const [appointments, setAppointments] = useState([])
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    
+       const slotDateFormat = (slotdate) =>{
+        const dataArray = slotdate.split('-')
+        const day = dataArray[0]
+        const month = dataArray[1]
+        const year = dataArray[2]
+        
+        return day + ' ' + months[Number(month - 1) ] + ' ' + year
+      }
 
     const getAllDoctors = async () => {
         try {
@@ -16,7 +28,7 @@ const AdmincontextProvider = (props) => {
                 backendUrl + `/api/admin/all-doctors`,
                 {},
                 {
-                    headers: { token: adminToken }
+                    headers: { adminToken }
                 }
             );
 
@@ -39,7 +51,7 @@ const AdmincontextProvider = (props) => {
                 backendUrl + `/api/admin/change-avalability`,
                 {docId},
                 {
-                    headers: { token: adminToken }
+                    headers: { adminToken }
                 }
             );
 
@@ -55,13 +67,39 @@ const AdmincontextProvider = (props) => {
         }
     }
 
+    const getAllAppointments = async () =>{
+        try {
+            const {data} = await axios.get(
+                backendUrl + `/api/admin/get-all-appointments`,
+                {
+                    headers: { adminToken }
+                }
+            );
+
+            if (data.success){
+                setAppointments(data.appointments)
+                console.log(data.appointments)
+            } else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+     
+
     const value = {
         adminToken,
         setAdminToken,
         backendUrl,
         doctors,
         getAllDoctors,
-        changeAvailability
+        changeAvailability,
+        getAllAppointments,
+        appointments,
+        setAppointments
+       
     };
 
     return (

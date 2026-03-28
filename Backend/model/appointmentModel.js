@@ -12,6 +12,7 @@ amount : {type: Number,required: true},
     date: {type: Date, default: Date.now},
     cancelled: {type: Boolean, default: false},
     payment: {type: Boolean, default: false},
+    paymentReference: { type: String, default: "" },
     isCompleted: {type: Boolean, default: false},
 
 })

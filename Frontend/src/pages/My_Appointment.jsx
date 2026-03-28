@@ -4,20 +4,70 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const My_Appointment = () => {
 
   const {backendUrl,token} = useContext(AppContext)
   const [appointment,setAppointment] = useState([])
+  const [verifyingPayment, setVerifyingPayment] = useState(false)
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-
+  
   const slotDateFormat = (slotdate) =>{
     const dataArray = slotdate.split('-')
     const day = dataArray[0]
     const month = dataArray[1]
     const year = dataArray[2]
-
+    
     return day + ' ' + months[Number(month - 1) ] + ' ' + year
+  }
+  const location = useLocation()
+  const navigate = useNavigate()
+
+
+  const appointmentPaystack = async(appointmentId) =>{ // Renamed function
+    try {
+      const {data} = await axios.post(backendUrl + '/api/user/appointment-paystack',{appointmentId},{headers: {token}}) // Changed endpoint
+
+        if(data.success){
+          // Redirect to Paystack authorization URL
+          window.location.href = data.authorization_url;
+          console.log(data)
+        } else {
+          toast.error(data.message);
+        }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || error.message);
+    }
+  }
+
+  const verifyPaystackPayment = async (reference) => {
+    if (!reference || !token || verifyingPayment) {
+      return
+    }
+
+    try {
+      setVerifyingPayment(true)
+      const { data } = await axios.post(
+        backendUrl + '/api/user/verify-paystack',
+        { reference },
+        { headers: { token } }
+      )
+
+      if (data.success) {
+        toast.success(data.message)
+        await getAppointment()
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(error.response?.data?.message || error.message)
+    } finally {
+      setVerifyingPayment(false)
+      navigate('/my_appointment', { replace: true })
+    }
   }
 
   const getAppointment = async() =>{
@@ -56,19 +106,21 @@ const My_Appointment = () => {
   }
 
   useEffect(() =>{
-    getAppointment()
-  },[token])
-
-  useEffect(() =>{
     if(token){
       getAppointment()
        
     }
   },[token])
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const reference = searchParams.get('reference') || searchParams.get('trxref')
 
-  const {doctors} = useContext(AppContext)
-  // console.log(doctors)
+    if (token && reference) {
+      verifyPaystackPayment(reference)
+    }
+  }, [location.search, token])
+
   return (
     <div>
       <p className='pb-3 mt-12 font-medium text-zinc-700 border-b'>My Appointments</p>
@@ -92,12 +144,14 @@ const My_Appointment = () => {
           <div className="flex flex-col gap-2 justify-end">
             
 
-            { !item.cancelled && <button className='text-sm text-stone-500 text-center sm:min-w-48 border hover:bg-primary hover:text-white transition-all duration-300 py-2'>Pay online</button>
+            { !item.cancelled && !item.payment && <button onClick={() => appointmentPaystack(item._id)} className='text-sm text-stone-500 text-center sm:min-w-48 border hover:bg-primary hover:text-white transition-all duration-300 py-2'>Pay online</button>
 
             }
             { !item.cancelled && <button onClick={() => cancelAppointment(item._id)} className='text-sm text-stone-500 text-center sm:min-w-48 border hover:bg-red-600 hover:text-white transition-all duration-300 py-2'>Cancel Appointment</button>
             }
 
+            { item.payment && <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-600'>Payment Successful</button>
+}
             { item.cancelled && <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>Appointment Cancelled</button>
 }
 

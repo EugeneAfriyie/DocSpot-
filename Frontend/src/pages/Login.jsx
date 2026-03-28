@@ -46,17 +46,31 @@ const Login = () => {
         
       } catch (error) {
         console.log(error)
-        toast.error(error.message)
+        toast.error(error.response?.data?.message || error.message)
       }
   }
 
   useEffect(() => {
       if(token){
-        // window.location.href = "/"
-        navigate('/')
+        try {
+          // Decode the token payload to check for expiration
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const isExpired = payload.exp * 1000 < Date.now();
+          
+          if (isExpired) {
+            localStorage.removeItem('token');
+            setToken(false);
+            toast.info("Session expired. Please log in again.");
+          } else {
+            navigate('/')
+          }
+        } catch (error) {
+          // Fallback if the token format is invalid
+          localStorage.removeItem('token');
+          setToken(false);
+        }
       }
-  },[token]
-)
+  },[token, navigate, setToken])
 
   return (
     <form onSubmit={onSubmit} className='min-h-[80vh flex items-center' action="">

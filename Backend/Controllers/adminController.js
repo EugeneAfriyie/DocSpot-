@@ -1,7 +1,8 @@
 import validator from 'validator';
-import bycrypt, { hash } from 'bcrypt';
+import bycrypt from 'bcrypt';
 import {v2 as cloudinary} from 'cloudinary';
 import doctorModel from '../model/doctorModel.js';
+import appointmentModel from '../model/appointmentModel.js';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
@@ -82,7 +83,6 @@ const addDoctor = async (req, res ) =>{
         res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 }
-
 // API TO GET ALL DOCTORS
 const allDoctors = async (req,res) =>{
     try {
@@ -93,35 +93,21 @@ const allDoctors = async (req,res) =>{
         res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 }
-
 // api for admin login 
-
 const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-
-        console.log("Email:", email);
-console.log("Password:", password);
-console.log("Expected:", process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD);
-
-if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    return res.status(200).json({ success: true, message: 'Admin logged in successfully', token });
-} else {
-    console.log("Invalid credentials reached!");
-    return res.json({ success: false, message: 'Invalid email or password' });
-}
-
-        // 1. Check if env variables are loaded (Debugging)
-        if (!process.env.ADMIN_EMAIL || !process.env.JWT_SECRET) {
+        // Check if env variables are loaded
+        if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) {
+            console.error("Admin environment variables are not set.");
             return res.status(500).json({ success: false, message: "Server configuration missing" });
         }
 
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             
-            // 2. FIX: Pass an object to jwt.sign
-            // Also, don't include the password in the token payload for security!
+            // The payload should identify the user as an admin.
+            // Note: This token will not work on user-only routes that expect a user `id`.
             const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1d' }); 
 
             return res.status(200).json({ 
@@ -137,9 +123,67 @@ if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD
         }
     } catch (error) {
         console.error('Error logging in admin:', error);
-        // This ensures the frontend ALWAYS gets JSON even on crash
         res.status(500).json({ success: false, message: error.message });
     }
 }
 
-export  {addDoctor,adminLogin,allDoctors}; 
+// API TO GET ALL APPOINTMENT OF A DOCTOR 
+const adminListAppointments = async (req, res) => {
+    try {
+        const appointments = await appointmentModel.find({});
+        res.json({ success: true, appointments });
+    } catch (error) {
+        console.error('Error fetching doctor appointments:', error);
+        res.status(500).json({ success: false, message: error.message || 'Server error' });
+    }
+}
+
+// API TO CANCEL APPOINTMENT  
+const cancelAppointment = async (req, res) => {
+
+  try {
+    const {appointmentId} = req.body;
+    // const userId = req.user;
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+
+    await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true},{new:true})
+
+    //  releasing doc slot
+    const { docId ,slotdate,slotTime} = appointmentData;
+    const doctorData = await doctorModel.findById(docId);
+
+    let slot_booked = doctorData.slots_booked;
+
+   slot_booked[slotdate] = slot_booked[slotdate].filter((time) => time !== slotTime);
+
+   await doctorModel.findByIdAndUpdate(
+    docId,
+    { slots_booked: slot_booked },
+    { returnDocument: 'after' }
+  );
+
+    res.status(200).json({ success: true, message: "Appointment cancelled successfully" });
+ 
+  } catch (error) {
+    console.log(error)
+      res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
+// API TO GET DASHBOARD DATA FOR ADMIN 
+
+const dashboardData = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+
+
+
+
+export  {addDoctor,adminLogin,allDoctors,adminListAppointments,cancelAppointment}; 

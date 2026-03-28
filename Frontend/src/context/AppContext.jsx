@@ -39,46 +39,6 @@ const AppContextProvider = (props) => {
         }
     };
 
-    const UndateUserData = async () => {
-        try {
-            const { data } = await axios.post(
-                backendUrl + `try {
-            const { data } = await axios.post(
-                backendUrl + `/api/admin/all-doctors`,
-                {},
-                {
-                    headers: { token: adminToken }
-                }
-            );
-
-            if (data.success) {
-                setDoctors(data.doctors);
-                // console.log(data.doctors)
-            } else {
-                toast.error(data.message);
-            }
-
-        } catch (error) {
-            toast.error(error.message);
-        }s`,
-                {},
-                {
-                    headers: { token }
-                }
-            );
-
-            if (data.success) {
-                setDoctors(data.doctors);
-                // console.log(data.doctors)
-            } else {
-                toast.error(data.message);
-            }
-
-        } catch (error) {
-            toast.error(error.message);
-        }
-    }
-
     const loadUserData = async () => {
     try {
         const { data } = await axios.get(
@@ -95,6 +55,12 @@ const AppContextProvider = (props) => {
     } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || error.message);
+        // Automatically log out if the backend rejects the token
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('token');
+            setToken(false);
+            setUserdata(false);
+        }
     }
     };
 

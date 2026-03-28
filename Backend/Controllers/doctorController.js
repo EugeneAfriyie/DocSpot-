@@ -30,7 +30,7 @@ const changeAvailability = async (req, res) => {
 const doctorList = async (req, res) => {
   try {
     const doctors = await doctorModel.find({}).select(['-password', '-email']);
-    console.log("Doctors List Fetched Successfully", doctors);
+    // console.log("Doctors List Fetched Successfully", doctors);
 
 
     res.json({
