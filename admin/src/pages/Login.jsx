@@ -73,7 +73,7 @@ const Login = () => {
           <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),transparent_38%),linear-gradient(135deg,transparent,rgba(255,255,255,0.08))]' />
           <div className='relative z-10 flex h-full flex-col justify-between'>
             <div>
-              <p className='text-xs uppercase tracking-[0.45em] text-cyan-100'>Percripto Console</p>
+              <p className='text-xs uppercase tracking-[0.45em] text-cyan-100'>MediApo Console</p>
               <h1 className='mt-6 max-w-md text-5xl font-semibold leading-tight'>
                 Elegant control for admins and doctors.
               </h1>
