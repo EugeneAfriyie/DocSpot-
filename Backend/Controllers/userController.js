@@ -4,8 +4,8 @@ import { v2 as cloudinary } from 'cloudinary';
 import userModel from '../model/userModel.js';
 import jwt from 'jsonwebtoken';
 import doctorModel from '../model/doctorModel.js';
-import appointmentModel from '../model/appointmentModel.js'; // Keep this
-import axios from 'axios'; // Import axios for making HTTP requests to Paystack API
+import appointmentModel from '../model/appointmentModel.js'; 
+import axios from 'axios'; 
 
 const getPaystackErrorMessage = (error, fallbackMessage) => {
   return (
@@ -281,9 +281,9 @@ const cancelAppointment = async (req, res) => {
   }
 }
 
-// Removed Razorpay instance and related code
 
-// API TO MAKE PAYMENT WITH PAYSTACK
+
+
 const paymentPaystack = async (req, res) => {
   try {
     const { appointmentId } = req.body;
