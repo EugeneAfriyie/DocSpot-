@@ -39,8 +39,10 @@ const Navbar = () => {
 
   return (
     <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-white/95 backdrop-blur'>
-      <div className='flex text-xs items-center gap-3'>
-        <img className='w-16 sm:w-40 cursor-pointer' src={assets.admin_logo} alt='' />
+      <div className='flex text-xs items-center gap-4 sm:gap-6'>
+        <h1 className='text-2xl sm:text-3xl font-extrabold text-primary cursor-pointer tracking-tight'>
+          MediApo <span className='hidden sm:inline-block text-xs font-semibold text-gray-500 uppercase tracking-widest ml-1'>Dashboard</span>
+        </h1>
         <div className='flex flex-col gap-1'>
           <p className='w-fit rounded-full border border-gray-500 px-2.5 py-0.5 text-gray-600'>
             {adminToken ? 'Admin' : 'Doctor'}

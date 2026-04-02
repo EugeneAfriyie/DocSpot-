@@ -261,17 +261,10 @@ const cancelAppointment = async (req, res) => {
 
     //  releasing doc slot
     const { docId ,slotdate,slotTime} = appointmentData;
-    const doctorData = await doctorModel.findById(docId);
-
-    let slot_booked = doctorData.slots_booked;
-
-   slot_booked[slotdate] = slot_booked[slotdate].filter((time) => time !== slotTime);
-
-   await doctorModel.findByIdAndUpdate(
-    docId,
-    { slots_booked: slot_booked },
-    { returnDocument: 'after' }
-  );
+    await doctorModel.findByIdAndUpdate(
+      docId,
+      { $pull: { [`slots_booked.${slotdate}`]: slotTime } }
+    );
 
     res.status(200).json({ success: true, message: "Appointment cancelled successfully" });
  
