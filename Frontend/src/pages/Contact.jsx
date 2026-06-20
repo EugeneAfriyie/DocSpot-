@@ -15,10 +15,10 @@ const Contact = () => {
           <p className='font-semibold text-lg text-gray-600'>Our Clinic</p>
           <p className='text-gray-500'>
             54709 Healthway Station <br /> 
-            Suite 350, Washington, USA
+            Suite 350, Kumasi, Ghana
           </p>
           <p className='text-gray-500'>
-            Tel: (415) 555-0132 <br /> 
+            Tel: (233) 557-342449 <br /> 
             Email: support@mediappo.com
           </p>
           
